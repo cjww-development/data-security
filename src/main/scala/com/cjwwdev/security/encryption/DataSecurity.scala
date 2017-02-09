@@ -60,8 +60,29 @@ trait DataSecurity extends DataCommon {
 }
 
 trait DataCommon {
-  val KEY = ConfigFactory.load.getString("data-security.key")
-  val SALT = ConfigFactory.load.getString("data-security.salt")
+
+  private val BACKUP_KEY = "BACK_UP_KEY"
+  private val BACKUP_SALT = "BACK_UP_SALT"
+
+  private val KEY : String = {
+    Try(ConfigFactory.load.getString("data-security.key")) match {
+      case Success(config) => config
+      case Failure(ex) =>
+        Logger.error("[DataCommon] - [KEY] : Security key not found; reverting to back up key")
+        ex.printStackTrace()
+        BACKUP_KEY
+    }
+  }
+
+  private val SALT : String = {
+    Try(ConfigFactory.load.getString("data-security.salt")) match {
+      case Success(config) => config
+      case Failure(ex) =>
+        Logger.error("[DataCommon] - [SALT] : Security salt not found; reverting to back up salt")
+        BACKUP_SALT
+    }
+  }
+
   private val LENGTH = 16
 
   def keyToSpec: SecretKeySpec = {
