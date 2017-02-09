@@ -16,3 +16,4 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 bintrayOrganization := Some("cjww-development")
 bintrayReleaseOnPublish in ThisBuild := false
 bintrayRepository := "releases"
+bintrayOmitLicense := true
