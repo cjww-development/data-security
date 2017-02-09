@@ -1,5 +1,3 @@
-import play.core.PlayVersion
-
 name := "data-security"
 
 version := "1.0"
@@ -14,3 +12,5 @@ libraryDependencies ++= Seq(
 )
 
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+bintrayOrganization := Some("cjww-development")
