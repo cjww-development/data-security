@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 bintrayOrganization := Some("cjww-development")
+bintrayReleaseOnPublish in ThisBuild := false
+bintrayRepository := "releases"
