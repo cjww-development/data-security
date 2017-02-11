@@ -1,8 +1,8 @@
+
 name := "data-security"
-
-version := "1.0"
-
+version := "0.1.0"
 scalaVersion := "2.11.8"
+organization := "com.cjww-dev.libs"
 
 libraryDependencies ++= Seq(
   "commons-codec" % "commons-codec" % "1.10",
