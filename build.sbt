@@ -1,7 +1,15 @@
+import com.typesafe.config.ConfigFactory
+import scala.util.{Failure, Success, Try}
+
+val bTVersion : String = {
+  Try(ConfigFactory.load.getString("version")) match {
+    case Success(ver) => ver
+    case Failure(_) => "INVALID_RELEASE_VERSION"
+  }
+}
 
 name := "data-security"
-val RELEASE_VERSION = "RELEASE_VERSION"
-version := sys.props.getOrElse(RELEASE_VERSION, default = "0.1.0")
+version := bTVersion
 scalaVersion := "2.11.8"
 organization := "com.cjww-dev.libs"
 
