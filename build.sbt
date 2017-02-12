@@ -1,6 +1,7 @@
 
 name := "data-security"
-version := "0.1.0"
+val RELEASE_VERSION = "RELEASE_VERSION"
+version := sys.props.getOrElse(RELEASE_VERSION, default = "0.1.0")
 scalaVersion := "2.11.8"
 organization := "com.cjww-dev.libs"
 
