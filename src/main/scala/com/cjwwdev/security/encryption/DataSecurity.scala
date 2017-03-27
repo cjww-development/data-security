@@ -35,7 +35,7 @@ trait DataSecurity extends DataCommon {
     def scramble(json: JsValue): Option[String] = {
       val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
       cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
-      Try(Base64.encodeBase64String(cipher.doFinal(json.toString.getBytes("UTF-8")))) match {
+      Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.toString.getBytes("UTF-8")))) match {
         case Success(encrypted) => Some(encrypted)
         case Failure(ex) =>
           Logger.error("[DataSecurity] - [encryptData] : INPUT FAILED ENCRYPTION")
@@ -69,7 +69,6 @@ trait DataCommon {
       case Success(config) => config
       case Failure(ex) =>
         Logger.error("[DataCommon] - [KEY] : Security key not found; reverting to back up key")
-        ex.printStackTrace()
         BACKUP_KEY
     }
   }
