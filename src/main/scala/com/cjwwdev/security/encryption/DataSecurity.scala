@@ -37,9 +37,8 @@ trait DataSecurity extends DataCommon {
       cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
       Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.toString.getBytes("UTF-8")))) match {
         case Success(encrypted) => Some(encrypted)
-        case Failure(ex) =>
+        case Failure(_) =>
           Logger.error("[DataSecurity] - [encryptData] : INPUT FAILED ENCRYPTION")
-          ex.printStackTrace()
           None
       }
     }
@@ -51,9 +50,8 @@ trait DataSecurity extends DataCommon {
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => validate[T](new String(decrypted))
-      case Failure(ex) =>
+      case Failure(_) =>
         Logger.error("[DataSecurity] - [decryptInto] : DECRYPTION FAILED")
-        ex.printStackTrace()
         None
     }
   }
@@ -67,7 +65,7 @@ trait DataCommon {
   private val KEY : String = {
     Try(ConfigFactory.load.getString("data-security.key")) match {
       case Success(config) => config
-      case Failure(ex) =>
+      case Failure(_) =>
         Logger.error("[DataCommon] - [KEY] : Security key not found; reverting to back up key")
         BACKUP_KEY
     }
@@ -76,7 +74,7 @@ trait DataCommon {
   private val SALT : String = {
     Try(ConfigFactory.load.getString("data-security.salt")) match {
       case Success(config) => config
-      case Failure(ex) =>
+      case Failure(_) =>
         Logger.error("[DataCommon] - [SALT] : Security salt not found; reverting to back up salt")
         BACKUP_SALT
     }
@@ -86,7 +84,7 @@ trait DataCommon {
 
   def keyToSpec: SecretKeySpec = {
     var keyBytes = (SALT + KEY).getBytes("UTF-8")
-    val sha = MessageDigest.getInstance("SHA-1")
+    val sha = MessageDigest.getInstance("SHA-512")
     keyBytes = sha.digest(keyBytes)
     keyBytes = util.Arrays.copyOf(keyBytes, LENGTH)
     new SecretKeySpec(keyBytes, "AES")
