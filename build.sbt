@@ -10,14 +10,13 @@ val bTVersion : String = {
 
 name := "data-security"
 version := bTVersion
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.10"
 organization := "com.cjww-dev.libs"
 
 libraryDependencies ++= Seq(
   "commons-codec" % "commons-codec" % "1.10",
-  "ch.qos.logback" % "logback-classic" % "1.1.7",
-  "com.typesafe.play" % "play_2.11" % "2.5.12",
-  "org.scalatestplus.play" % "scalatestplus-play_2.11" % "1.5.1"
+  "com.typesafe.play" % "play_2.11" % "2.5.14",
+  "org.scalatestplus.play" % "scalatestplus-play_2.11" % "2.0.0"
 )
 
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
