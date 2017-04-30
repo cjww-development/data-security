@@ -24,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.json.{Format, JsValue, Json}
 import com.typesafe.config.ConfigFactory
-import play.api.Logger
+import com.cjwwdev.logging.Logger
 
 import scala.util.{Failure, Success, Try}
 
