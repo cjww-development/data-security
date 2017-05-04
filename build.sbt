@@ -16,7 +16,7 @@ organization := "com.cjww-dev.libs"
 libraryDependencies ++= Seq(
   "commons-codec" % "commons-codec" % "1.10",
   "com.typesafe.play" % "play_2.11" % "2.5.14",
-  "com.cjww-dev.libs" % "logging_2.11" % "0.3.0",
+  "com.cjww-dev.libs" % "logging_2.11" % "0.4.0",
   "org.scalatestplus.play" % "scalatestplus-play_2.11" % "2.0.0"
 )
 
