@@ -61,10 +61,11 @@ trait DataCommon {
 
   private val BACKUP_KEY = "BACK_UP_KEY"
   private val BACKUP_SALT = "BACK_UP_SALT"
+  private val env = ConfigFactory.load.getString("environment")
 
   private val KEY : String = {
-    Try(ConfigFactory.load.getString("data-security.key")) match {
-      case Success(config) => config
+    Try(ConfigFactory.load.getString(s"$env.data-security.key")) match {
+      case Success(conf) => conf
       case Failure(_) =>
         Logger.error("[DataCommon] - [KEY] : Security key not found; reverting to back up key")
         BACKUP_KEY
@@ -72,8 +73,8 @@ trait DataCommon {
   }
 
   private val SALT : String = {
-    Try(ConfigFactory.load.getString("data-security.salt")) match {
-      case Success(config) => config
+    Try(ConfigFactory.load.getString(s"$env.data-security.salt")) match {
+      case Success(conf) => conf
       case Failure(_) =>
         Logger.error("[DataCommon] - [SALT] : Security salt not found; reverting to back up salt")
         BACKUP_SALT
