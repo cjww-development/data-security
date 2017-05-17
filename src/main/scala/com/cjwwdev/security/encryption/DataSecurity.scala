@@ -83,7 +83,7 @@ trait DataCommon {
 
   private val LENGTH = 16
 
-  def keyToSpec: SecretKeySpec = {
+  private[encryption] def keyToSpec: SecretKeySpec = {
     var keyBytes = (SALT + KEY).getBytes("UTF-8")
     val sha = MessageDigest.getInstance("SHA-512")
     keyBytes = sha.digest(keyBytes)
@@ -91,9 +91,9 @@ trait DataCommon {
     new SecretKeySpec(keyBytes, "AES")
   }
 
-  def validate[T](unlocked: String)(implicit format: Format[T]): Option[T] = {
+  private[encryption] def validate[T](unlocked: String)(implicit format: Format[T]): Option[T] = {
     Json.parse(unlocked).validate[T].fold(
-      errors => None,
+      _ => None,
       valid => Some(valid)
     )
   }
