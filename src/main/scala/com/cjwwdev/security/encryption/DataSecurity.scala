@@ -22,7 +22,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.{Format, JsValue, Json, OWrites, Reads}
 import com.typesafe.config.ConfigFactory
 import com.cjwwdev.logging.Logger
 
@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
 object DataSecurity extends DataSecurity
 
 trait DataSecurity extends DataCommon {
-  def encryptData[T](data: T)(implicit format: Format[T]): Option[String] = {
+  def encryptData[T](data: T)(implicit writes: OWrites[T]): Option[String] = {
     def scramble(json: JsValue): Option[String] = {
       val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
       cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
@@ -45,11 +45,11 @@ trait DataSecurity extends DataCommon {
     scramble(Json.toJson(data))
   }
 
-  def decryptInto[T](data: String)(implicit format: Format[T]): Option[T] = {
+  def decryptInto[T](data: String)(implicit reads: Reads[T]): Option[T] = {
     val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
-      case Success(decrypted) => validate[T](new String(decrypted))
+      case Success(decrypted) => validate[T](new String(decrypted))(reads)
       case Failure(_) =>
         Logger.error("[DataSecurity] - [decryptInto] : DECRYPTION FAILED")
         None
@@ -91,7 +91,7 @@ trait DataCommon {
     new SecretKeySpec(keyBytes, "AES")
   }
 
-  private[encryption] def validate[T](unlocked: String)(implicit format: Format[T]): Option[T] = {
+  private[encryption] def validate[T](unlocked: String)(implicit reads: Reads[T]): Option[T] = {
     Json.parse(unlocked).validate[T].fold(
       _ => None,
       valid => Some(valid)

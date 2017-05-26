@@ -17,7 +17,7 @@
 package com.cjwwdev.security.encryption
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json._
 
 class DataSecuritySpec extends PlaySpec {
 
@@ -38,24 +38,6 @@ class DataSecuritySpec extends PlaySpec {
       val dec = testSecurity.decryptInto[TestModel](enc.get)(TestModel.format)
 
       dec mustBe Some(testModel)
-    }
-
-    "encrypt a string and back again" in new Setup {
-      val testString = "testing123"
-
-      val enc = testSecurity.encryptData[String](testString)
-      val dec = testSecurity.decryptInto[String](enc.get)
-
-      dec mustBe Some(testString)
-    }
-
-    "encrypt a int and back again" in new Setup {
-      val testInt = 12345
-
-      val enc = testSecurity.encryptData[Int](testInt)
-      val dec = testSecurity.decryptInto[Int](enc.get)
-
-      dec mustBe Some(testInt)
     }
   }
 }
