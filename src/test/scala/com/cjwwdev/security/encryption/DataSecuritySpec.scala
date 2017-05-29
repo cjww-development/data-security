@@ -34,10 +34,19 @@ class DataSecuritySpec extends PlaySpec {
     "encrypt a case class and back again" in new Setup {
       val testModel = TestModel("testString", 12345)
 
-      val enc = testSecurity.encryptData[TestModel](testModel)(TestModel.format)
-      val dec = testSecurity.decryptInto[TestModel](enc.get)(TestModel.format)
+      val enc = testSecurity.encryptType[TestModel](testModel)(TestModel.format)
+      val dec = testSecurity.decryptIntoType[TestModel](enc.get)(TestModel.format)
 
       dec mustBe Some(testModel)
+    }
+
+    "encrypt a string and back again" in new Setup {
+      val testString = "testString"
+
+      val enc = testSecurity.encryptString(testString)
+      val dec = testSecurity.decryptString(enc.get)
+
+      dec mustBe Some(testString)
     }
   }
 }

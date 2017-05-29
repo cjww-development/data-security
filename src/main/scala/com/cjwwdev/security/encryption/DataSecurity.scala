@@ -22,7 +22,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{Format, JsValue, Json, OWrites, Reads}
+import play.api.libs.json.{JsValue, Json, Reads, Writes}
 import com.typesafe.config.ConfigFactory
 import com.cjwwdev.logging.Logger
 
@@ -31,53 +31,68 @@ import scala.util.{Failure, Success, Try}
 object DataSecurity extends DataSecurity
 
 trait DataSecurity extends DataCommon {
-  def encryptData[T](data: T)(implicit writes: OWrites[T]): Option[String] = {
+  def encryptType[T](data: T)(implicit writes: Writes[T]): Option[String] = {
     def scramble(json: JsValue): Option[String] = {
       val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
       cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
       Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.toString.getBytes("UTF-8")))) match {
         case Success(encrypted) => Some(encrypted)
         case Failure(_) =>
-          Logger.error("[DataSecurity] - [encryptData] : INPUT FAILED ENCRYPTION")
+          Logger.error("[DataSecurity] - [encryptType] : INPUT FAILED ENCRYPTION")
           None
       }
     }
     scramble(Json.toJson(data))
   }
 
-  def decryptInto[T](data: String)(implicit reads: Reads[T]): Option[T] = {
+  def decryptIntoType[T](data: String)(implicit reads: Reads[T]): Option[T] = {
     val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => validate[T](new String(decrypted))(reads)
       case Failure(_) =>
-        Logger.error("[DataSecurity] - [decryptInto] : DECRYPTION FAILED")
+        Logger.error("[DataSecurity] - [decryptIntoType] : DECRYPTION FAILED")
+        None
+    }
+  }
+
+  def encryptString(data: String): Option[String] = {
+    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+    cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
+    Try(Base64.encodeBase64URLSafeString(cipher.doFinal(data.getBytes("UTF-8")))) match {
+      case Success(encrypted) => Some(encrypted)
+      case Failure(_) =>
+        Logger.error("[DataSecurity] - [encryptString] : INPUT FAILED ENCRYPTION")
+        None
+    }
+  }
+
+  def decryptString(data: String): Option[String] = {
+    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+    cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
+    Try(cipher.doFinal(Base64.decodeBase64(data))) match {
+      case Success(decrypted) => Some(new String(decrypted))
+      case Failure(_) =>
+        Logger.error("[DataSecurity] - [decryptIntoType] : DECRYPTION FAILED")
         None
     }
   }
 }
 
 trait DataCommon {
-
-  private val BACKUP_KEY = "BACK_UP_KEY"
-  private val BACKUP_SALT = "BACK_UP_SALT"
   private val env = ConfigFactory.load.getString("environment")
 
   private val KEY : String = {
     Try(ConfigFactory.load.getString(s"$env.data-security.key")) match {
       case Success(conf) => conf
-      case Failure(_) =>
-        Logger.error("[DataCommon] - [KEY] : Security key not found; reverting to back up key")
-        BACKUP_KEY
+      case Failure(e) => throw e
     }
   }
 
   private val SALT : String = {
     Try(ConfigFactory.load.getString(s"$env.data-security.salt")) match {
       case Success(conf) => conf
-      case Failure(_) =>
-        Logger.error("[DataCommon] - [SALT] : Security salt not found; reverting to back up salt")
-        BACKUP_SALT
+      case Failure(e) => throw e
     }
   }
 
