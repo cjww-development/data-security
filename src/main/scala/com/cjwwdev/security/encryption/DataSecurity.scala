@@ -38,7 +38,7 @@ trait DataSecurity extends DataCommon {
       Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.toString.getBytes("UTF-8")))) match {
         case Success(encrypted) => Some(encrypted)
         case Failure(_) =>
-          Logger.error("[DataSecurity] - [encryptType] : INPUT FAILED ENCRYPTION")
+          Logger.error("[DataSecurity] - [encryptType]: The input data type failed to be encrypted")
           None
       }
     }
@@ -51,7 +51,7 @@ trait DataSecurity extends DataCommon {
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => validate[T](new String(decrypted))(reads)
       case Failure(_) =>
-        Logger.error("[DataSecurity] - [decryptIntoType] : DECRYPTION FAILED")
+        Logger.error("[DataSecurity] - [decryptIntoType] : The input string has been failed decryption")
         None
     }
   }
@@ -62,7 +62,7 @@ trait DataSecurity extends DataCommon {
     Try(Base64.encodeBase64URLSafeString(cipher.doFinal(data.getBytes("UTF-8")))) match {
       case Success(encrypted) => Some(encrypted)
       case Failure(_) =>
-        Logger.error("[DataSecurity] - [encryptString] : INPUT FAILED ENCRYPTION")
+        Logger.error("[DataSecurity] - [encryptString]: The input string has been failed encryption")
         None
     }
   }
@@ -73,7 +73,7 @@ trait DataSecurity extends DataCommon {
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => Some(new String(decrypted))
       case Failure(_) =>
-        Logger.error("[DataSecurity] - [decryptIntoType] : DECRYPTION FAILED")
+        Logger.error("[DataSecurity] - [decryptString]: The input string has failed decryption")
         None
     }
   }
