@@ -31,50 +31,48 @@ import scala.util.{Failure, Success, Try}
 object DataSecurity extends DataSecurity
 
 trait DataSecurity extends DataCommon {
-  def encryptType[T](data: T)(implicit writes: Writes[T]): Option[String] = {
-    def scramble(json: JsValue): Option[String] = {
-      val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
-      cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
-      Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.toString.getBytes("UTF-8")))) match {
-        case Success(encrypted) => Some(encrypted)
-        case Failure(_) =>
-          Logger.error("[DataSecurity] - [encryptType]: The input data type failed to be encrypted")
-          None
-      }
+  def encryptType[T](data: T)(implicit writes: Writes[T]): String = {
+    val json = Json.toJson(data).toString
+    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+    cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
+    Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.getBytes("UTF-8")))) match {
+      case Success(enc) => enc
+      case Failure(e)   =>
+        Logger.error("[DataSecurity] - [encryptType]: The input data type failed to be encrypted")
+        throw e
     }
-    scramble(Json.toJson(data))
   }
 
-  def decryptIntoType[T](data: String)(implicit reads: Reads[T]): Option[T] = {
+  def decryptIntoType[T](data: String)(implicit reads: Reads[T]): T = {
     val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
-      case Success(decrypted) => validate[T](new String(decrypted))(reads)
-      case Failure(_) =>
+      case Success(decrypted) => Json.parse(new String(decrypted)).as[T](reads)
+      case Failure(e) =>
         Logger.error("[DataSecurity] - [decryptIntoType] : The input string has been failed decryption")
-        None
+        throw e
     }
   }
 
-  def encryptString(data: String): Option[String] = {
+  def encryptString(data: String): String = {
     val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
     Try(Base64.encodeBase64URLSafeString(cipher.doFinal(data.getBytes("UTF-8")))) match {
-      case Success(encrypted) => Some(encrypted)
-      case Failure(_) =>
+      case Success(encrypted) => encrypted
+      case Failure(e) =>
         Logger.error("[DataSecurity] - [encryptString]: The input string has been failed encryption")
-        None
+        throw e
     }
   }
 
-  def decryptString(data: String): Option[String] = {
+  def decryptString(data: String): String = {
     val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
-      case Success(decrypted) => Some(new String(decrypted))
-      case Failure(_) =>
+      case Success(decrypted) => new String(decrypted)
+      case Failure(e) =>
         Logger.error("[DataSecurity] - [decryptString]: The input string has failed decryption")
-        None
+        throw e
     }
   }
 }
@@ -104,12 +102,5 @@ trait DataCommon {
     keyBytes = sha.digest(keyBytes)
     keyBytes = util.Arrays.copyOf(keyBytes, LENGTH)
     new SecretKeySpec(keyBytes, "AES")
-  }
-
-  private[encryption] def validate[T](unlocked: String)(implicit reads: Reads[T]): Option[T] = {
-    Json.parse(unlocked).validate[T].fold(
-      _ => None,
-      valid => Some(valid)
-    )
   }
 }

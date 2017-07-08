@@ -16,17 +16,34 @@
 
 package com.cjwwdev.security.encryption
 
+import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
 class DataSecuritySpec extends PlaySpec {
 
+  val now = DateTime.now(DateTimeZone.UTC)
+  
   class Setup {
     val testSecurity = DataSecurity
 
     case class TestModel(string: String, int: Int)
     object TestModel {
       implicit val format = Json.format[TestModel]
+    }
+
+    case class PartialModel(string: String, int: Int, createdAt: DateTime, builder: Option[String])
+    object PartialModel {
+      implicit val partialModelReads = new Reads[PartialModel] {
+        override def reads(json: JsValue) = JsSuccess(
+          PartialModel(
+            string = json.\("string").as[String],
+            int    = json.\("int").as[Int],
+            createdAt = now,
+            builder = Some("testUser")
+          )
+        )
+      }
     }
   }
 
@@ -35,18 +52,28 @@ class DataSecuritySpec extends PlaySpec {
       val testModel = TestModel("testString", 12345)
 
       val enc = testSecurity.encryptType[TestModel](testModel)(TestModel.format)
-      val dec = testSecurity.decryptIntoType[TestModel](enc.get)(TestModel.format)
+      val dec = testSecurity.decryptIntoType[TestModel](enc)(TestModel.format)
 
-      dec mustBe Some(testModel)
+      dec mustBe testModel
     }
 
     "encrypt a string and back again" in new Setup {
       val testString = "testString"
 
       val enc = testSecurity.encryptString(testString)
-      val dec = testSecurity.decryptString(enc.get)
+      val dec = testSecurity.decryptString(enc)
 
-      dec mustBe Some(testString)
+      dec mustBe testString
+    }
+
+    "encrypt a TestModel and decrypt as a PartialModel" in new Setup {
+      val enc = testSecurity.encryptType[TestModel](TestModel("testString", 616))
+      val dec = testSecurity.decryptIntoType[PartialModel](enc)
+
+      dec.string mustBe "testString"
+      dec.int mustBe 616
+      dec.createdAt mustBe now
+      dec.builder mustBe Some("testUser")
     }
   }
 }
