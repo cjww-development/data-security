@@ -15,9 +15,9 @@ organization := "com.cjww-dev.libs"
 
 libraryDependencies ++= Seq(
   "commons-codec" % "commons-codec" % "1.10",
-  "com.typesafe.play" % "play_2.11" % "2.5.15",
-  "com.cjww-dev.libs" % "logging_2.11" % "0.7.0",
-  "org.scalatestplus.play" % "scalatestplus-play_2.11" % "2.0.0"
+  "com.cjww-dev.libs" % "logging_2.11" % "0.9.0",
+  "com.typesafe.play" % "play_2.11" % "2.6.1",
+  "org.scalatestplus.play" % "scalatestplus-play_2.11" % "3.1.0"
 )
 
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
