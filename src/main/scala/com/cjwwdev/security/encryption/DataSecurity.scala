@@ -22,7 +22,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{JsValue, Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import com.typesafe.config.ConfigFactory
 import com.cjwwdev.logging.Logger
 
@@ -31,9 +31,11 @@ import scala.util.{Failure, Success, Try}
 object DataSecurity extends DataSecurity
 
 trait DataSecurity extends DataCommon {
+
+  private val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+
   def encryptType[T](data: T)(implicit writes: Writes[T]): String = {
     val json = Json.toJson(data).toString
-    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
     Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.getBytes("UTF-8")))) match {
       case Success(enc) => enc
@@ -44,7 +46,6 @@ trait DataSecurity extends DataCommon {
   }
 
   def decryptIntoType[T](data: String)(implicit reads: Reads[T]): T = {
-    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => Json.parse(new String(decrypted)).as[T](reads)
@@ -55,7 +56,6 @@ trait DataSecurity extends DataCommon {
   }
 
   def encryptString(data: String): String = {
-    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
     Try(Base64.encodeBase64URLSafeString(cipher.doFinal(data.getBytes("UTF-8")))) match {
       case Success(encrypted) => encrypted
@@ -66,7 +66,6 @@ trait DataSecurity extends DataCommon {
   }
 
   def decryptString(data: String): String = {
-    val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => new String(decrypted)
@@ -80,21 +79,17 @@ trait DataSecurity extends DataCommon {
 trait DataCommon {
   private val env = ConfigFactory.load.getString("environment")
 
-  private val KEY : String = {
-    Try(ConfigFactory.load.getString(s"$env.data-security.key")) match {
-      case Success(conf) => conf
-      case Failure(e) => throw e
-    }
-  }
-
-  private val SALT : String = {
-    Try(ConfigFactory.load.getString(s"$env.data-security.salt")) match {
-      case Success(conf) => conf
-      case Failure(e) => throw e
-    }
-  }
-
   private val LENGTH = 16
+
+  private val KEY : String = Try(ConfigFactory.load.getString(s"$env.data-security.key")) match {
+    case Success(conf) => conf
+    case Failure(e) => throw e
+  }
+
+  private val SALT : String = Try(ConfigFactory.load.getString(s"$env.data-security.salt")) match {
+    case Success(conf) => conf
+    case Failure(e) => throw e
+  }
 
   private[encryption] def keyToSpec: SecretKeySpec = {
     var keyBytes = (SALT + KEY).getBytes("UTF-8")

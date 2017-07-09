@@ -1,11 +1,9 @@
 import com.typesafe.config.ConfigFactory
 import scala.util.{Failure, Success, Try}
 
-val bTVersion : String = {
-  Try(ConfigFactory.load.getString("version")) match {
-    case Success(ver) => ver
-    case Failure(_) => "0.1.0"
-  }
+val bTVersion : String = Try(ConfigFactory.load.getString("version")) match {
+  case Success(ver) => ver
+  case Failure(_)   => "0.1.0"
 }
 
 name := "data-security"
@@ -15,8 +13,7 @@ organization := "com.cjww-dev.libs"
 
 libraryDependencies ++= Seq(
   "commons-codec" % "commons-codec" % "1.10",
-  "com.cjww-dev.libs" % "logging_2.11" % "0.9.0",
-  "com.typesafe.play" % "play_2.11" % "2.6.1",
+  "com.cjww-dev.libs" % "logging_2.11" % "0.11.0",
   "org.scalatestplus.play" % "scalatestplus-play_2.11" % "3.1.0"
 )
 
