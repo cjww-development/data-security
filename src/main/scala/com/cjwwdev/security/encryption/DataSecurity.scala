@@ -23,8 +23,8 @@ import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.json.{Json, Reads, Writes}
+import play.api.Logger
 import com.typesafe.config.ConfigFactory
-import com.cjwwdev.logging.Logger
 
 import scala.util.{Failure, Success, Try}
 
