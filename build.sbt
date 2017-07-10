@@ -12,7 +12,7 @@ scalaVersion := "2.11.11"
 organization := "com.cjww-dev.libs"
 
 libraryDependencies ++= Seq(
-  "commons-codec" % "commons-codec" % "1.10",
+  "commons-codec"          % "commons-codec"           % "1.10",
   "org.scalatestplus.play" % "scalatestplus-play_2.11" % "3.1.0"
 )
 
