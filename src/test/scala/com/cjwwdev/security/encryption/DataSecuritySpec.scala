@@ -54,7 +54,7 @@ class DataSecuritySpec extends PlaySpec {
       val enc = testSecurity.encryptType[TestModel](testModel)(TestModel.format)
       val dec = testSecurity.decryptIntoType[TestModel](enc)(TestModel.format)
 
-      dec mustBe testModel
+      dec mustBe JsSuccess(testModel)
     }
 
     "encrypt a string and back again" in new Setup {
@@ -70,10 +70,14 @@ class DataSecuritySpec extends PlaySpec {
       val enc = testSecurity.encryptType[TestModel](TestModel("testString", 616))
       val dec = testSecurity.decryptIntoType[PartialModel](enc)
 
-      dec.string mustBe "testString"
-      dec.int mustBe 616
-      dec.createdAt mustBe now
-      dec.builder mustBe Some("testUser")
+      val expected = PartialModel(
+        string = "testString",
+        int = 616,
+        createdAt = now,
+        builder = Some("testUser")
+      )
+
+      dec mustBe JsSuccess(expected)
     }
   }
 }

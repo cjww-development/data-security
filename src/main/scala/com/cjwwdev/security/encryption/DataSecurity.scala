@@ -22,7 +22,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{JsResult, Json, Reads, Writes}
 import play.api.Logger
 import com.typesafe.config.ConfigFactory
 
@@ -45,10 +45,10 @@ trait DataSecurity extends DataCommon {
     }
   }
 
-  def decryptIntoType[T](data: String)(implicit reads: Reads[T]): T = {
+  def decryptIntoType[T](data: String)(implicit reads: Reads[T]): JsResult[T] = {
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
-      case Success(decrypted) => Json.parse(new String(decrypted)).as[T](reads)
+      case Success(decrypted) => Json.parse(new String(decrypted)).validate[T](reads)
       case Failure(e) =>
         Logger.error("[DataSecurity] - [decryptIntoType] : The input string has been failed decryption")
         throw e
