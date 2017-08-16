@@ -77,25 +77,23 @@ trait DataSecurity extends DataCommon {
 }
 
 trait DataCommon {
-  private val env = ConfigFactory.load.getString("environment")
-
   private val LENGTH = 16
 
-  private val KEY : String = Try(ConfigFactory.load.getString(s"$env.data-security.key")) match {
+  private val KEY : String = Try(ConfigFactory.load.getString("microservice.data-security.key")) match {
     case Success(conf) => conf
-    case Failure(e) => throw e
+    case Failure(e)    => throw e
   }
 
-  private val SALT : String = Try(ConfigFactory.load.getString(s"$env.data-security.salt")) match {
+  private val SALT : String = Try(ConfigFactory.load.getString(s"microservice.data-security.salt")) match {
     case Success(conf) => conf
-    case Failure(e) => throw e
+    case Failure(e)    => throw e
   }
 
   private[encryption] def keyToSpec: SecretKeySpec = {
     var keyBytes = (SALT + KEY).getBytes("UTF-8")
-    val sha = MessageDigest.getInstance("SHA-512")
-    keyBytes = sha.digest(keyBytes)
-    keyBytes = util.Arrays.copyOf(keyBytes, LENGTH)
+    val sha      = MessageDigest.getInstance("SHA-512")
+    keyBytes     = sha.digest(keyBytes)
+    keyBytes     = util.Arrays.copyOf(keyBytes, LENGTH)
     new SecretKeySpec(keyBytes, "AES")
   }
 }

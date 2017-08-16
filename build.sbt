@@ -6,8 +6,8 @@ val bTVersion : String = Try(ConfigFactory.load.getString("version")) match {
   case Failure(_)   => "0.1.0"
 }
 
-name := "data-security"
-version := bTVersion
+name         := "data-security"
+version      := bTVersion
 scalaVersion := "2.11.11"
 organization := "com.cjww-dev.libs"
 
@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
 
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-bintrayOrganization := Some("cjww-development")
+bintrayOrganization                  := Some("cjww-development")
 bintrayReleaseOnPublish in ThisBuild := true
-bintrayRepository := "releases"
-bintrayOmitLicense := true
+bintrayRepository                    := "releases"
+bintrayOmitLicense                   := true
