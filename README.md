@@ -13,8 +13,8 @@ To utilise this library add this to your sbt build file
 "com.cjww-dev.libs" % "data-security_2.11" % "2.7.0" 
 ```
 
-##About
-####DataSecurity.scala
+## About
+#### DataSecurity.scala
 
 **encryptType**<br>
 Takes a parameter of type **T** and an implicit Json Writes[T] and returns an encrypted **String**.
@@ -29,7 +29,6 @@ Takes a parameter of type **T** and an implicit Json Writes[T] and returns an en
     val encString: String = DataSecurity.encryptType[ExampleCaseClass](ExampleCaseClass("exp", 616))
 ```
 
-<br><br>
 
 **decryptIntoType**<br>
 Takes an encrypted **String** parameter and an implicit Json Reads[T] and returns a **T**.
@@ -44,7 +43,6 @@ Takes an encrypted **String** parameter and an implicit Json Reads[T] and return
     val string: ExampleCaseClass = DataSecurity.decryptIntoType[ExampleCaseClass]("ENCRYPTED_STRING")
 ```
 
-<br><br>
 
 **encryptString**<br>
 Takes a **String** parameter and returns an encrypted **String**.
@@ -55,7 +53,6 @@ Takes a **String** parameter and returns an encrypted **String**.
     val string: String = DataSecurity.encryptString("string")
 ```
 
-<br><br>
 
 **decryptString**<br>
 Takes an encrypted **String** parameter and returns a **String**.
@@ -65,9 +62,9 @@ Takes an encrypted **String** parameter and returns a **String**.
 ```scala
     val string: String = DataSecurity.decryptString("ENCRYPTED_STRING")
 ```
-<br>
 
-####SHA512.scala
+
+#### SHA512.scala
 
 Unlike DataSecurity the function in SHA512 in **not** reversible.
 
@@ -79,9 +76,9 @@ Takes a **String** parameter and returns an encrypted **String**.
 ```scala
     val string: String = SHA512.encrypt("string")
 ```
-<br>
 
-####Configuration
+
+#### Configuration
 
 Add this config to your conf/application.conf file in your scala play project.
 
