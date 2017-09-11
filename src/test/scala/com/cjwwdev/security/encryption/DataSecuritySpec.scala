@@ -23,7 +23,7 @@ import play.api.libs.json._
 class DataSecuritySpec extends PlaySpec {
 
   val now = DateTime.now(DateTimeZone.UTC)
-  
+
   class Setup {
     val testSecurity = DataSecurity
 
@@ -34,7 +34,7 @@ class DataSecuritySpec extends PlaySpec {
 
     case class PartialModel(string: String, int: Int, createdAt: DateTime, builder: Option[String])
     object PartialModel {
-      implicit val partialModelReads = new Reads[PartialModel] {
+      implicit val partialModelReads: Reads[PartialModel] = new Reads[PartialModel] {
         override def reads(json: JsValue) = JsSuccess(
           PartialModel(
             string = json.\("string").as[String],

@@ -33,8 +33,8 @@ object DataSecurity extends DataSecurity
 trait DataSecurity extends DataCommon {
 
   private val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
-
-  def encryptType[T](data: T)(implicit writes: Writes[T]): String = {
+  
+  def encryptType[T: Writes](data: T): String = {
     val json = Json.toJson(data).toString
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
     Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.getBytes("UTF-8")))) match {
@@ -45,10 +45,10 @@ trait DataSecurity extends DataCommon {
     }
   }
 
-  def decryptIntoType[T](data: String)(implicit reads: Reads[T]): JsResult[T] = {
+  def decryptIntoType[T: Reads](data: String): JsResult[T] = {
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
-      case Success(decrypted) => Json.parse(new String(decrypted)).validate[T](reads)
+      case Success(decrypted) => Json.parse(new String(decrypted)).validate[T]
       case Failure(e) =>
         Logger.error("[DataSecurity] - [decryptIntoType] : The input string has been failed decryption")
         throw e
@@ -89,11 +89,8 @@ trait DataCommon {
     case Failure(e)    => throw e
   }
 
-  private[encryption] def keyToSpec: SecretKeySpec = {
-    var keyBytes = (SALT + KEY).getBytes("UTF-8")
-    val sha      = MessageDigest.getInstance("SHA-512")
-    keyBytes     = sha.digest(keyBytes)
-    keyBytes     = util.Arrays.copyOf(keyBytes, LENGTH)
-    new SecretKeySpec(keyBytes, "AES")
+  protected val keyToSpec: SecretKeySpec = {
+    val sha512   = MessageDigest.getInstance("SHA-512").digest((SALT + KEY).getBytes("UTF-8"))
+    new SecretKeySpec(util.Arrays.copyOf(sha512, LENGTH), "AES")
   }
 }
