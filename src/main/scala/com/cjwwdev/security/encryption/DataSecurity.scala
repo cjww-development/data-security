@@ -16,15 +16,15 @@
 
 package com.cjwwdev.security.encryption
 
-import java.util
 import java.security.MessageDigest
+import java.util
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
-import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{JsResult, Json, Reads, Writes}
-import play.api.Logger
 import com.typesafe.config.ConfigFactory
+import org.apache.commons.codec.binary.Base64
+import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsResult, Json, Reads, Writes}
 
 import scala.util.{Failure, Success, Try}
 
@@ -33,44 +33,36 @@ object DataSecurity extends DataSecurity
 trait DataSecurity extends DataCommon {
 
   private val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+
+  private val logger = LoggerFactory.getLogger(getClass)
   
   def encryptType[T: Writes](data: T): String = {
     val json = Json.toJson(data).toString
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
-    Try(Base64.encodeBase64URLSafeString(cipher.doFinal(json.getBytes("UTF-8")))) match {
-      case Success(enc) => enc
-      case Failure(e)   =>
-        Logger.error("[DataSecurity] - [encryptType]: The input data type failed to be encrypted")
-        throw e
-    }
+    Base64.encodeBase64URLSafeString(cipher.doFinal(json.getBytes("UTF-8")))
   }
 
   def decryptIntoType[T: Reads](data: String): JsResult[T] = {
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => Json.parse(new String(decrypted)).validate[T]
-      case Failure(e) =>
-        Logger.error("[DataSecurity] - [decryptIntoType] : The input string has been failed decryption")
+      case Failure(e)         =>
+        logger.error("[decryptIntoType] : the input string has failed decryption")
         throw e
     }
   }
 
   def encryptString(data: String): String = {
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
-    Try(Base64.encodeBase64URLSafeString(cipher.doFinal(data.getBytes("UTF-8")))) match {
-      case Success(encrypted) => encrypted
-      case Failure(e) =>
-        Logger.error("[DataSecurity] - [encryptString]: The input string has been failed encryption")
-        throw e
-    }
+    Base64.encodeBase64URLSafeString(cipher.doFinal(data.getBytes("UTF-8")))
   }
 
   def decryptString(data: String): String = {
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
     Try(cipher.doFinal(Base64.decodeBase64(data))) match {
       case Success(decrypted) => new String(decrypted)
-      case Failure(e) =>
-        Logger.error("[DataSecurity] - [decryptString]: The input string has failed decryption")
+      case Failure(e)         =>
+        logger.error("[decryptString] - the input string has failed decryption")
         throw e
     }
   }

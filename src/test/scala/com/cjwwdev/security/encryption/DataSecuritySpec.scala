@@ -24,31 +24,30 @@ class DataSecuritySpec extends PlaySpec {
 
   val now = DateTime.now(DateTimeZone.UTC)
 
-  class Setup {
-    val testSecurity = DataSecurity
+  val testSecurity = DataSecurity
 
-    case class TestModel(string: String, int: Int)
-    object TestModel {
-      implicit val format = Json.format[TestModel]
-    }
+  case class TestModel(string: String, int: Int)
 
-    case class PartialModel(string: String, int: Int, createdAt: DateTime, builder: Option[String])
-    object PartialModel {
-      implicit val partialModelReads: Reads[PartialModel] = new Reads[PartialModel] {
-        override def reads(json: JsValue) = JsSuccess(
-          PartialModel(
-            string = json.\("string").as[String],
-            int    = json.\("int").as[Int],
-            createdAt = now,
-            builder = Some("testUser")
-          )
+  object TestModel {
+    implicit val format = Json.format[TestModel]
+  }
+
+  case class PartialModel(string: String, int: Int, createdAt: DateTime, builder: Option[String])
+  object PartialModel {
+    implicit val partialModelReads: Reads[PartialModel] = new Reads[PartialModel] {
+      override def reads(json: JsValue) = JsSuccess(
+        PartialModel(
+          string    = json.\("string").as[String],
+          int       = json.\("int").as[Int],
+          createdAt = now,
+          builder   = Some("testUser")
         )
-      }
+      )
     }
   }
 
   "DataSecurity" should {
-    "encrypt a case class and back again" in new Setup {
+    "encrypt a case class and back again" in {
       val testModel = TestModel("testString", 12345)
 
       val enc = testSecurity.encryptType[TestModel](testModel)(TestModel.format)
@@ -57,7 +56,7 @@ class DataSecuritySpec extends PlaySpec {
       dec mustBe JsSuccess(testModel)
     }
 
-    "encrypt a string and back again" in new Setup {
+    "encrypt a string and back again" in {
       val testString = "testString"
 
       val enc = testSecurity.encryptString(testString)
@@ -66,15 +65,15 @@ class DataSecuritySpec extends PlaySpec {
       dec mustBe testString
     }
 
-    "encrypt a TestModel and decrypt as a PartialModel" in new Setup {
+    "encrypt a TestModel and decrypt as a PartialModel" in {
       val enc = testSecurity.encryptType[TestModel](TestModel("testString", 616))
       val dec = testSecurity.decryptIntoType[PartialModel](enc)
 
       val expected = PartialModel(
-        string = "testString",
-        int = 616,
+        string    = "testString",
+        int       = 616,
         createdAt = now,
-        builder = Some("testUser")
+        builder   = Some("testUser")
       )
 
       dec mustBe JsSuccess(expected)

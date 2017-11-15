@@ -21,24 +21,15 @@ import java.security.MessageDigest
 object SHA512 extends SHA512
 
 trait SHA512 {
-  def encrypt(plainText: String) : String = {
-    val sha512 = MessageDigest.getInstance("SHA-512")
-    val bytes = plainText.getBytes()
-    val hash = sha512.digest(bytes)
+  private val sha512 = MessageDigest.getInstance("SHA-512")
 
-    var result = ""
-
-    def loopArray(increment: Int): String = {
-      if(increment >= hash.length - 1) {
-        val x = hash(increment)
-        result ++= "%02x".format(x).toString
-        result
-      } else {
-        val b = hash(increment)
-        result ++= "%02x".format(b).toString
-        loopArray(increment + 1)
-      }
-    }
-    loopArray(0)
+  def encrypt(plainText: String): String = {
+    val bytes     = plainText.getBytes("UTF-8")
+    val byteHash  = sha512.digest(bytes)
+    val res       = for {
+      byte   <- byteHash
+      result <- "%02x".format(byte).toString
+    } yield result
+    new String(res)
   }
 }

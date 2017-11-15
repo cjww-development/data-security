@@ -19,40 +19,38 @@ package com.cjwwdev.security.encryption
 import org.scalatestplus.play.PlaySpec
 
 class SHA512Spec extends PlaySpec {
-
-  class Setup {
-    object TestSec extends SHA512
-  }
-
+  
+  val testSec = SHA512
+  
   "sha512" should {
-    "return a string exactly 128 chars long and isnt equal to what was input" in new Setup {
-      val result = TestSec.encrypt("testString")
+    "return a string exactly 128 chars long and isnt equal to what was input" in {
+      val result = testSec.encrypt("testString")
       result.length mustBe 128
       assert(result != "testString")
     }
 
-    "encrypt a string that is five chars long and still return a 128 char string" in new Setup {
-      val result = TestSec.encrypt("aaaaa")
+    "encrypt a string that is five chars long and still return a 128 char string" in {
+      val result = testSec.encrypt("aaaaa")
       result.length mustBe 128
     }
 
-    "encrypt a string that is ten chars long and still return a 128 char string" in new Setup {
-      val result = TestSec.encrypt("aaaaaaaaaa")
+    "encrypt a string that is ten chars long and still return a 128 char string" in {
+      val result = testSec.encrypt("aaaaaaaaaa")
       result.length mustBe 128
     }
 
-    "encrypt a string that is fifty chars long and still return a 128 char string" in new Setup {
-      val result = TestSec.encrypt("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    "encrypt a string that is fifty chars long and still return a 128 char string" in {
+      val result = testSec.encrypt("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
       result.length mustBe 128
     }
 
-    "encrypt a string that is one hundred chars long and still return a 128 char string" in new Setup {
-      val result = TestSec.encrypt("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    "encrypt a string that is one hundred chars long and still return a 128 char string" in {
+      val result = testSec.encrypt("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
       result.length mustBe 128
     }
 
-    "encrypt a string that is two hundred chars long and still return a 128 char string" in new Setup {
-      val result = TestSec.encrypt("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    "encrypt a string that is two hundred chars long and still return a 128 char string" in {
+      val result = testSec.encrypt("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
       result.length mustBe 128
     }
   }

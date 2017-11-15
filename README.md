@@ -21,7 +21,7 @@ Takes a parameter of type **T** and an implicit Json Writes[T] and returns an en
 
 ***Example***
 
-```sbtshell
+```scala
     case class ExampleCaseClass(str: String, int: Int)
     
     implicit val writer = Json.writes[ExampleCaseClass]
@@ -85,7 +85,7 @@ Add this config to your conf/application.conf file in your scala play project.
 ```hocon
     microservice {
       data-security {
-        key = ""
+        key  = ""
         salt = ""
       }
     }
