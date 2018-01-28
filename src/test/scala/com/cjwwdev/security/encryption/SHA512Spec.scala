@@ -21,7 +21,7 @@ import org.scalatestplus.play.PlaySpec
 class SHA512Spec extends PlaySpec {
   
   val testSec = SHA512
-  
+
   "sha512" should {
     "return a string exactly 128 chars long and isnt equal to what was input" in {
       val result = testSec.encrypt("testString")

@@ -13,6 +13,8 @@ val dependencies: Seq[ModuleID] = Seq(
   "org.scalatestplus.play" % "scalatestplus-play_2.11" % "2.0.1"
 )
 
+val configKeyBase = "microservice.data-security"
+
 lazy val library = Project(libraryName, file("."))
   .settings(
     version                              :=  bTVersion,
@@ -23,5 +25,10 @@ lazy val library = Project(libraryName, file("."))
     bintrayOrganization                  :=  Some("cjww-development"),
     bintrayReleaseOnPublish in ThisBuild :=  true,
     bintrayRepository                    :=  "releases",
-    bintrayOmitLicense                   :=  true
+    bintrayOmitLicense                   :=  true,
+    fork                    in Test      :=  true,
+    javaOptions             in Test      :=  Seq(
+      s"-D$configKeyBase.key=testKey",
+      s"-D$configKeyBase.salt=testSalt"
+    )
   )

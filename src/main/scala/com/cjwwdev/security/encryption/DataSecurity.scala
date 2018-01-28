@@ -72,10 +72,10 @@ trait DataCommon {
   private val LENGTH = 16
 
   private val KEY : String  = ConfigFactory.load.getString("microservice.data-security.key")
-  private val SALT : String = ConfigFactory.load.getString(s"microservice.data-security.salt")
+  private val SALT : String = ConfigFactory.load.getString("microservice.data-security.salt")
 
   protected val keyToSpec: SecretKeySpec = {
-    val sha512   = MessageDigest.getInstance("SHA-512").digest((SALT + KEY).getBytes("UTF-8"))
+    val sha512 = MessageDigest.getInstance("SHA-512").digest((SALT + KEY).getBytes("UTF-8"))
     new SecretKeySpec(util.Arrays.copyOf(sha512, LENGTH), "AES")
   }
 }
