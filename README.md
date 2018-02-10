@@ -5,6 +5,9 @@
 data-security
 =================
 
+##### This Library has been merged with application-utilities and will no longer be maintained
+
+
 Mechanisms for encrypting and decrypting data
 
 To utilise this library add this to your sbt build file
